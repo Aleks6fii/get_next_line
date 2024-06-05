@@ -1,4 +1,34 @@
+#include "get_next_line.h"
 #include <unistd.h>
+#include <stdlib.h>
+
+size_t	ft_strlen(const char *str)
+{
+	int	i;
+
+	i = 0;
+	while (str[i] != '\0')
+		i++;
+	return (i);
+}
+
+char	*ft_strchr(char *s, int c)
+{
+	int	i;
+
+	i = 0;
+	if (!s)
+		return (0);
+	if (c == '\0')
+		return ((char *)&s[ft_strlen(s)]);
+	while (s[i] != '\0')
+	{
+		if (s[i] == (char) c)
+			return ((char *)&s[i]);
+		i++;
+	}
+	return (0);
+}
 
 char	*ft_strjoin(char const *s1, char const *s2)
 {
@@ -26,37 +56,92 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (pt);
 }
 
-char	*ft_strchr(const char *s, int c)
+// this function is to parse line from a string of a file 
+char *get_ln(char *string)
 {
-	char	ch;
-	int		i;
+	int i;
+	char *ln;
 
 	i = 0;
-	ch = (char) c;
-	printf("char: %c\n", ch);
-	printf("int: %i\n", ch);
-	while (s[i] != '\0')
+	if (!string[i])
+		return (NULL);
+	// this loop is to calculate the length of the line 
+	while (string[i] && string[i] != '\n')
+		i++;
+	// allocate memory for the line 
+	ln = malloc(sizeof(char) * (i + 2));
+	if (!ln)
+		return (NULL);
+	i = 0;
+	// write line before \n
+	while (string[i] && string[i] != '\n')
 	{
-		if (s[i] == ch)
-			return ((char *) &s[i]);
+		ln[i] = string[i];
 		i++;
 	}
-	if (s[i] == ch)
-		return ((char *) &s[i]);
-	return (0);
+	if (string[i] == '\n')
+	{
+		ln[i] = '\n'; // end the line if have '\n'
+		i++;
+	}
+	ln[i] = '\0';     // and null-terminate 
+	return (ln);
 }
 
-int ft_strcmp(char *s1, char *s2) {
-    // Compare characters until reaching the end of either string
-    while (*s1 != '\0' || *s2 != '\0') {
-        // If the characters are not equal, return the difference
-        if (*s1 != *s2) {
-            return (*s1 - *s2);
-        }
-        // Move to the next character in each string
-        s1++;
-        s2++;
+char *new_str(char *string) // pointer to the cumulative static var from the previous runs of get_next_line
+{
+    int i;
+    int j;
+    char *str;
+
+    i = 0;
+    while (string[i] && string[i] != '\n') // skip already parsed part
+        i++;
+    if (!string[i]) // if end of the string (file?)
+    {
+        free(string);
+        return (NULL);
     }
-    // If both strings are equal, return 0
-    return 0;
+    str = malloc(sizeof(char) * (ft_strlen(string) - i + 1));
+    if (!str) {
+        free(string);
+        return (NULL);
+    }
+    i++;
+    j = 0;
+    while (string[i])
+        str[j++] = string[i++]; // write what was left to the str variable
+    str[j] = '\0';
+    free(string);
+    return (str);
 }
+
+
+// old version new_str -------------------------
+/*
+char *new_str(char *string) // pointer to the cumulative static var from the previous runs of get_next_line
+{
+	int i;
+	int j;
+	char *str;
+
+	i = 0;
+	while (string[i] && string[i] != '\n') // skip already parsed part
+		i++;
+	if (!string[i]) // if end of the string (file?)
+	{
+		free(string);
+		return (NULL);
+	}
+	str = malloc(sizeof(char) * (ft_strlen(string) - i + 1));
+	if (!str)
+		return (NULL);
+	i++;
+	j = 0;
+	while (string[i])
+		str[j++] = string[i++]; // write what was left to the str variable
+	str[j] = '\0';
+	free(string);
+	return (str);
+}
+*/

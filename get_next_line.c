@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <fcntl.h>
-#include <stdlib.h>
-
 #include "get_next_line.h"
-#include <unistd.h>
 
 char *read_str(int fd, char *s);
 
@@ -11,44 +6,26 @@ char *get_next_line(int fd)
 {
     static char *string;
     char *line;
+	char *new_string;
 
     if (fd < 0 || BUFFER_SIZE <= 0)
         return (NULL);
     string = read_str(fd, string);
     if (!string)
     {   // nothing was read
+		free(string);
         return (NULL);
     }
     line = get_ln(string); // parse a line (ending with \n)
-    char *new_string = new_str(string); // function to parse the rest of a string (after \n)
+    new_string = new_str(string); // function to parse the rest of a string (after \n)
     if (!new_string) {
         string = NULL; // Prevents dangling pointer
     }
     string = new_string;
+	// free(string);  // need or not?
     return (line);
 }
 
-// old version 
-/*
-char *get_next_line(int fd)
-{
-	static char *string;
-	char *line;
-
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (0);
-	string = read_str(fd, string);
-	if (!string)
-	{   // nothing was read
-		free(string); // ??
-		return (NULL);
-	}
-	line = get_ln(string); // parse a line (endinf with \n)
-	// function to parse the rest of a string (after \n)
-	string = new_str(string);
-	return (line);
-}
-*/
 
 char *read_str(int fd, char *s)
 {
@@ -82,47 +59,23 @@ char *read_str(int fd, char *s)
 }
 
 
-// old read_str ///////////////////////////////////////////
-/*
-// reads a string of BUFFER_SIZE from file
-// saves to cumulative variable
-// char	*ft_read_to_left_str(int fd, char *left_str)
-char *read_str(int fd, char *s)
-{
-	char *buff;     // buffer to read from file
-	int bytes;      // count read bytes
-
-	buff = malloc((BUFFER_SIZE + 1) * sizeof(char)); // mem alloc buffer_size + 1
-	if (!buff)                            // if allocation failed 
-		return (NULL);
-	bytes = 1;
-	while (!ft_strchr(s, '\n') && bytes != 0) // while we did not reach end of line 
-	{
-		bytes = read(fd, buff, BUFFER_SIZE);  // read from file 
-		if (bytes == -1)                      // if failed ???
-		{
-			free(buff);
-			return (NULL);
-		}
-		buff[bytes] = '\0';      // null-terminate
-		s = ft_strjoin(s, buff); // join existing string + wht was read to buffer
-	}
-	free(buff);  // free allocated memory
-	return (s);  // return string 
-}
-*/
-
-
 // ./a.out "text.txt"
 // int main(int ac, char **av)
+
+// #include <stdio.h>
+// #include <fcntl.h>
 // int main(void)
 // {
 // 	char	*line;
 // 	int		i;
 // 	int		fd1;
-
-// 	fd1 = open("test.txt", O_RDONLY);
-
+// 	fd1 = open("read_error.txt", O_RDONLY);
+// 	// fd1 = 0;
+//     // while ((line = get_next_line(0)) != NULL) {
+//     //     printf("%s\n", line);
+//     //     free(line);
+//     // }
+//     // return 0;
 // 	i = 1;
 // 	while (i < 2)
 // 	{
@@ -133,6 +86,5 @@ char *read_str(int fd, char *s)
 // 		i++;
 // 	}
 // 	close(fd1);
-
 // 	return (0);
 // }

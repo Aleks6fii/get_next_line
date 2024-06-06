@@ -17,4 +17,5 @@ size_t	ft_strlen(const char *str);
 char	*get_ln(char *string);
 char	*new_str(char *string);
 
+
 #endif

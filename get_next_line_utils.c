@@ -116,32 +116,3 @@ char *new_str(char *string) // pointer to the cumulative static var from the pre
     return (str);
 }
 
-
-// old version new_str -------------------------
-/*
-char *new_str(char *string) // pointer to the cumulative static var from the previous runs of get_next_line
-{
-	int i;
-	int j;
-	char *str;
-
-	i = 0;
-	while (string[i] && string[i] != '\n') // skip already parsed part
-		i++;
-	if (!string[i]) // if end of the string (file?)
-	{
-		free(string);
-		return (NULL);
-	}
-	str = malloc(sizeof(char) * (ft_strlen(string) - i + 1));
-	if (!str)
-		return (NULL);
-	i++;
-	j = 0;
-	while (string[i])
-		str[j++] = string[i++]; // write what was left to the str variable
-	str[j] = '\0';
-	free(string);
-	return (str);
-}
-*/

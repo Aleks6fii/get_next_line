@@ -1,3 +1,4 @@
+.gitignore
 *.txt
 .vscode/
 main.c

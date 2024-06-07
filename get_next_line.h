@@ -6,7 +6,7 @@
 /*   By: afilippo <afilippo@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/06 19:10:54 by afilippo          #+#    #+#             */
-/*   Updated: 2024/06/07 18:17:14 by afilippo         ###   ########.fr       */
+/*   Updated: 2024/06/07 18:29:40 by afilippo         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 # include <unistd.h>
 
 # ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 10
+#  define BUFFER_SIZE 1000
 # endif
 
 char	*get_next_line(int fd);

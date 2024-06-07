@@ -1,90 +1,126 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: afilippo <afilippo@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/06/06 19:10:45 by afilippo          #+#    #+#             */
+/*   Updated: 2024/06/07 18:27:43 by afilippo         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line.h"
 
-char *read_str(int fd, char *s);
+char	*read_str(int fd, char *s);
+char	*read_until_newline(int fd, char *s, char *buff);
+char	*new_str(char *string);
+char	*allocate_and_copy(char *string, int start);
 
-char *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
-    static char *string;
-    char *line;
-	char *new_string;
+	static char	*string;
+	char		*line;
+	char		*new_string;
 
-    if (fd < 0 || BUFFER_SIZE <= 0)
-        return (NULL);
-    string = read_str(fd, string);
-    if (!string)
-    {   // nothing was read
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	string = read_str(fd, string);
+	if (!string)
+	{
 		free(string);
-        return (NULL);
-    }
-    line = get_ln(string); // parse a line (ending with \n)
-    new_string = new_str(string); // function to parse the rest of a string (after \n)
-    if (!new_string) {
-        string = NULL; // Prevents dangling pointer
-    }
-    string = new_string;
-	// free(string);  // need or not?
-    return (line);
+		return (NULL);
+	}
+	line = get_ln(string);
+	new_string = new_str(string);
+	if (!new_string)
+		string = NULL;
+	string = new_string;
+	return (line);
 }
 
-
-char *read_str(int fd, char *s)
+char	*read_str(int fd, char *s)
 {
-    char *buff;     // buffer to read from file
-    char *temp;     // temporary pointer to hold the joined string
-    int bytes;      // count read bytes
+	char	*buff;
 
-    buff = malloc((BUFFER_SIZE + 1) * sizeof(char)); // mem alloc buffer_size + 1
-    if (!buff)                            // if allocation failed 
-        return (NULL);
-    bytes = 1;
-    while (!ft_strchr(s, '\n') && bytes != 0) // while we did not reach end of line 
-    {
-        bytes = read(fd, buff, BUFFER_SIZE);  // read from file 
-        if (bytes == -1)                      // if failed ???
-        {
-            free(buff);
-            return (NULL);
-        }
-        buff[bytes] = '\0';      // null-terminate
-        temp = ft_strjoin(s, buff); // join existing string + what was read to buffer
-        free(s); // free old string
-        s = temp; // update s to new joined string
-        if (!s) { // check for allocation failure in ft_strjoin
-            free(buff);
-            return (NULL);
-        }
-    }
-    free(buff);  // free allocated memory
-    return (s);  // return string 
+	buff = malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buff)
+		return (NULL);
+	s = read_until_newline(fd, s, buff);
+	free(buff);
+	return (s);
 }
 
+char	*read_until_newline(int fd, char *s, char *buff)
+{
+	char	*temp;
+	int		bytes;
 
-// ./a.out "text.txt"
-// int main(int ac, char **av)
+	bytes = 1;
+	while (!ft_strchr(s, '\n') && bytes != 0)
+	{
+		bytes = read(fd, buff, BUFFER_SIZE);
+		if (bytes == -1)
+		{
+			free(s);
+			return (NULL);
+		}
+		buff[bytes] = '\0';
+		temp = ft_strjoin(s, buff);
+		free(s);
+		s = temp;
+		if (!s)
+		{
+			free(buff);
+			return (NULL);
+		}
+	}
+	return (s);
+}
 
-// #include <stdio.h>
-// #include <fcntl.h>
-// int main(void)
-// {
-// 	char	*line;
-// 	int		i;
-// 	int		fd1;
-// 	fd1 = open("read_error.txt", O_RDONLY);
-// 	// fd1 = 0;
-//     // while ((line = get_next_line(0)) != NULL) {
-//     //     printf("%s\n", line);
-//     //     free(line);
-//     // }
-//     // return 0;
-// 	i = 1;
-// 	while (i < 2)
-// 	{
-// 		line = get_next_line(fd1);
-// 		// printf("line [%02d]: %s", i, line);
-// 		printf("%s", line);
-// 		free(line);
-// 		i++;
-// 	}
-// 	close(fd1);
-// 	return (0);
-// }
+char	*new_str(char *string)
+{
+	int		i;
+	char	*str;
+
+	i = 0;
+	while (string[i] && string[i] != '\n')
+		i++;
+	if (!string[i])
+	{
+		free(string);
+		return (NULL);
+	}
+	i++;
+	str = allocate_and_copy(string, i);
+	if (!str)
+	{
+		return (NULL);
+	}
+	if (!(*str))
+	{
+		free(str);
+		free(string);
+		return (NULL);
+	}
+	free(string);
+	return (str);
+}
+
+char	*allocate_and_copy(char *string, int start)
+{
+	int		j;
+	char	*str;
+
+	j = 0;
+	str = malloc(sizeof(char) * (ft_strlen(string) - start + 1));
+	if (!str)
+	{
+		free(string);
+		return (NULL);
+	}
+	while (string[start])
+		str[j++] = string[start++];
+	str[j] = '\0';
+	return (str);
+}
